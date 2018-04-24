@@ -2,18 +2,18 @@ close all;
 mdl_cyton;
 blockDim = 0.02; %20mm
 bd = blockDim / 2;
-blocks = [[0.44, 0,   0]; %abcd
-          [0.36, 0,   0]; %efgh
-          [0.28, 0,   0]; %ijkl
-          [0.2,  0,   0]; %mnop
-          [0.44, 0.1, 0]; %qrst
-          [0.36, 0.1, 0]; %uvwx
-          [0.28, 0.1, 0]; %yz .
-          [0.2,  0.1, 0]];%!?,'
+blocks = [[0.34, 0,    0]; %abcd
+          [0.26, 0,    0]; %efgh
+          [0.18, 0,    0]; %ijkl
+          [0.10, 0,    0]; %mnop
+          [0.34, 0.08, 0]; %qrst
+          [0.26, 0.08, 0]; %uvwx
+          [0.18, 0.08, 0]; %yz .
+          [0.10, 0.08, 0]];%!?,'
 
-qh = [deg2rad(100), pi/4, 0, pi/2, 0, pi/4, deg2rad(-80)]; %resting position above blocks
+qh = [deg2rad(-80), pi/6, 0, 2*pi/3, 0, pi/6, deg2rad(10)]; %resting position above blocks
 Ph = cyton.fkine(qh);
-qu = [0, -pi/6, 0, -pi/3, 0, -pi/2, pi];
+qu = [0, pi/6, 0, pi/3, 0, pi/2, pi/2];
 Pu = cyton.fkine(qu);
 cyton.plot(qh);
 hold on;
@@ -26,7 +26,11 @@ cubePlot(blocks(6,:), blockDim,blockDim,blockDim, 'y');
 cubePlot(blocks(7,:), blockDim,blockDim,blockDim, 'k');
 cubePlot(blocks(8,:), blockDim,blockDim,blockDim, 'w');
 
-t = 20;
+% Time step is 0.05s, time arrays for 1, 2, and 5 second movements
+dt = 0.05;
+t1 = 0:dt:1;
+t2 = 0:dt:2;
+t5 = 0:dt:5;
 
 while 1
     c = input('', 's');
@@ -66,14 +70,22 @@ while 1
     %Position to grab block
     Pb = SE3(blocks(block,:) + [bd, bd, blockDim+0.001]) * SE3.Ry(pi) * SE3.Rz(-(pi/2)*double(face-1));
     
-    T1 = ctraj(Ph, Pa, t);
+    T1 = ctraj(Ph, Pa, length(t2));
     q1 = cyton.ikine(T1, 'q0', qh);
-    T2 = ctraj(Pa, Pb, t/2);
+    T2 = ctraj(Pa, Pb, length(t1));
     q2 = cyton.ikine(T2, 'q0', q1(end,:));
-    T3 = ctraj(Pb, Pa, t/2);
+    T3 = ctraj(Pb, Pa, length(t1));
     q3 = cyton.ikine(T3, 'q0', q2(end,:));
-    T4 = ctraj(Pa, Pu, t);
+    T4 = ctraj(Pa, Pu, length(t5));
     q4 = cyton.ikine(T4, 'q0', q3(end,:));
     
-    cyton.plot([q1;q2;q3;q4;flipud(q4);flipud(q3);flipud(q2);flipud(q1)]);
+    traj = [q1;q2;q3;q4;flipud(q4);flipud(q3);flipud(q2);flipud(q1)];
+    cyton.plot(traj);
+%     udp = PnetClass(8889, 8888, '127.0.0.1');
+%     udp.initialize();
+%     for t = traj.'
+%         udp.putData(typecast(t','uint8'));
+%         pause(dt);
+%     end
+%     udp.close();
 end

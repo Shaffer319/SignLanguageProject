@@ -22,20 +22,33 @@
 
 %     th  d  a  alpha
 
-links = [
+linksR1 = [
     % Create the robot using RVC tools
-    Revolute('d', 0.2,  'a', 0,     'alpha', pi/2,  'offset', pi/2);
-    Revolute('d', 0,    'a', 0.135, 'alpha', -pi/2, 'offset', pi/2);
-    Revolute('d', 0,    'a', 0.125, 'alpha', pi/2,  'offset', 0);
-    Revolute('d', 0,    'a', 0.125, 'alpha', -pi/2, 'offset', 0);
-    Revolute('d', 0,    'a', 0.135, 'alpha', pi/2,  'offset', 0);
-    Revolute('d', 0,    'a', 0,     'alpha', pi/2,  'offset', pi/2);
-    Revolute('d', 0.09, 'a', 0,     'alpha', 0,     'offset', pi/2);
+    Revolute('d', 0.12435000000000002,    'a', 0,                      'alpha', 0,     'offset', pi/2,  'modified');
+    Revolute('d', 0.0010000000000004658,  'a', 7.757919228897728e-18,  'alpha', -pi/2, 'offset', -pi/2, 'modified');
+    Revolute('d', 0.0010000000000022803,  'a', 0.12550000000000006,    'alpha', -pi/2, 'offset', 0,     'modified');
+    Revolute('d', 0.0004417705383168262,  'a', 0.11580000000000001,    'alpha', pi/2,  'offset', 0,     'modified');
+    Revolute('d', 2.8553548414578245e-15, 'a', 0.09745694175448363,    'alpha', -pi/2, 'offset', 0,     'modified');
+    Revolute('d', 1.6757428777935957e-15, 'a', 0.07180000000000028,    'alpha', pi/2,  'offset', pi/2,  'modified');
+    Revolute('d', 0.05142499999999982,    'a', 2.8518063219589436e-17, 'alpha', pi/2,  'offset', 0,     'modified');
 ];
 
-cyton = SerialLink(links, 'name', 'Cyton Epsilon 1500', 'manufacturer', 'Cyton');
-
+cyton = SerialLink(linksR1, 'name', 'Cyton Epsilon 1500', 'manufacturer', 'Cyton');
 cyton.base = transl(0.0, 0.0, 0.0)*rpy2tr(0, 0, 0, 'xyz');
+
+linksR2 = [
+    % Create the robot using RVC tools
+    Revolute('d', 0.12270000000000003,     'a', 0,                     'alpha', 0,     'offset', pi/2,  'modified');
+    Revolute('d', -1.2247147740396258e-15, 'a', 5.854647580881709e-16, 'alpha', -pi/2, 'offset', -pi/2, 'modified');
+    Revolute('d', 3.7816971776294395e-16,  'a', 0.12950000000000003,   'alpha', -pi/2, 'offset', 0,     'modified');
+    Revolute('d', 8.049116928532385e-16,   'a', 0.12199999999999966,   'alpha', pi/2,  'offset', 0,     'modified');
+    Revolute('d', -2.1510571102112408e-16, 'a', 0.12130000000000041,   'alpha', -pi/2, 'offset', 0,     'modified');
+    Revolute('d', 4.961309141293668e-16,   'a', 0.08469999999999993,   'alpha', pi/2,  'offset', pi/2,  'modified');
+    Revolute('d', 0.05742500000000015,     'a', 8.465526395203e-16,    'alpha', pi/2,  'offset', 0,     'modified');
+];
+
+cytonR2 = SerialLink(linksR2, 'name', 'Cyton Epsilon 1500 R2', 'manufacturer', 'Cyton');
+cytonR2.base = transl(0.0, 0.0, 0.0)*rpy2tr(0, 0, 0, 'xyz');
 
 % define the workspace vectors:
 %   qz         zero joint angle configuration
