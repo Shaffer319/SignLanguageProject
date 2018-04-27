@@ -2,23 +2,21 @@ close all;
 mdl_cyton;
 blockDim = 0.02; %20mm
 bd = blockDim / 2;
-blocks = [[0.34, 0,    0]; %abcd
-          [0.26, 0,    0]; %efgh
-          [0.18, 0,    0]; %ijkl
-          [0.10, 0,    0]; %mnop
-          [0.34, 0.08, 0]; %qrst
-          [0.26, 0.08, 0]; %uvwx
-          [0.18, 0.08, 0]; %yz .
-          [0.10, 0.08, 0]];%!?,'
+blocks = [[0.38, 0,    0]; %abcd
+          [0.32, 0,    0]; %efgh
+          [0.26, 0,    0]; %ijkl
+          [0.38, 0.06, 0]; %mnop
+          [0.32, 0.06, 0]; %qrst
+          [0.26, 0.06, 0]; %uvwx
+          [0.32, 0.12, 0]; %yz .
+          [0.26, 0.12, 0]];%!?,'
 
-qh = [deg2rad(-80), pi/6, 0, 2*pi/3, 0, pi/6, deg2rad(10)]; %resting position above blocks
+qh = [deg2rad(-80), pi/4, 0, pi/2, 0, pi/4, deg2rad(10)]; %resting position above blocks
 Ph = cyton.fkine(qh);
-qu = [0, pi/6, 0, pi/3, 0, pi/2, pi/2];
-Pu = cyton.fkine(qu);
-gripO = 0.015;
-gripC = 0.01;
+gripO = 0.0101;
+gripC = 0.009;
 
-cyton.plot(qh);
+cyton.teach(qh);
 hold on;
 cubePlot(blocks(1,:), blockDim,blockDim,blockDim, 'b');
 cubePlot(blocks(2,:), blockDim,blockDim,blockDim, 'g');
@@ -34,7 +32,7 @@ dt = 0.05;
 t1 = 0:dt:1;
 t2 = 0:dt:2;
 t5 = 0:dt:5;
-gripS = (gripO - gripC) / length(t1);
+gripS = (gripO - gripC) / 10;
 grip = gripO:-gripS:gripC;
 
 while 1
@@ -69,11 +67,21 @@ while 1
     end
     disp(block);
     disp(face);
+    rotate = false;
+    if face == uint8(3)
+        rotate = true;
+        face = uint8(1);
+    end
     
     %Position 10cm above block, and point +Y axis in direction of letter face
-    Pa = SE3(blocks(block,:) + [bd, bd, 0.1]) * SE3.Ry(pi) * SE3.Rz(-(pi/2)*double(face-1));
+    Pa = SE3(blocks(block,:) + [bd, bd, 0.1]) * SE3.Rx(pi) * SE3.Rz(pi) * SE3.Rz(-(pi/2)*double(face-1));
     %Position to grab block
-    Pb = SE3(blocks(block,:) + [bd, bd, blockDim+0.001]) * SE3.Ry(pi) * SE3.Rz(-(pi/2)*double(face-1));
+    Pb = SE3(blocks(block,:) + [bd, bd, 0.04]) * SE3.Rx(pi) * SE3.Rz(pi) * SE3.Rz(-(pi/2)*double(face-1));
+    %User position
+    Pu = SE3([0, 0.32, 0.28]) * SE3.Rx(pi);
+    if ~rotate
+        Pu = Pu * SE3.Rz(pi);
+    end
     
     T1 = ctraj(Ph, Pa, length(t2));
     q1 = [cyton.ikine(T1, 'q0', qh), gripO*ones(length(t2),1)];
@@ -83,10 +91,10 @@ while 1
     T3 = ctraj(Pb, Pa, length(t1));
     q3 = [cyton.ikine(T3, 'q0', q2(end,1:7)), gripC*ones(length(t1),1)];
     T4 = ctraj(Pa, Pu, length(t5));
-    q4 = [cyton.ikine(T4, 'q0', q3(end,1:7)), gripC*ones(length(t5),1)];
+    q4 = [cyton.ikine(T4, 'q0', q3(end,1:7), 'tol', 0.01), gripC*ones(length(t5),1)];
     
     traj = [q1;q2;qg;q3;q4;flipud(q4);flipud(q3);flipud(qg);flipud(q2);flipud(q1)];
-    cyton.plot(traj);
+    %cyton.plot(traj(:,1:7));
 %     udp = PnetClass(8889, 8888, '127.0.0.1');
 %     udp.initialize();
 %     for t = traj.'
