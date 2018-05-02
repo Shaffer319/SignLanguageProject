@@ -11,7 +11,7 @@ blocks = [[-0.40, -0.04, 0]; %abcd
           [-0.34, -0.16, 0]; %yz .
           [-0.28, -0.16, 0]];%!?,'
 
-qh = [deg2rad(-80), -pi/4, 0, -pi/2, 0, -pi/4, deg2rad(-10)]; %resting position above blocks
+qh = [deg2rad(-80), -pi/4, 0, -pi/2, 0, -pi/4, deg2rad(10)]; %resting position above blocks
 qu = [0, -pi/4, 0, -pi/4, 0, -pi/2, 0];
 Ph = cyton.fkine(qh);
 gripO = 0.0101;
