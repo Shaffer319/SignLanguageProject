@@ -32,7 +32,7 @@ linksR1 = [
     RevoluteMDH('d', 0.0004417705383168262,  'a', 0.11580000000000001,    'alpha', pi/2,  'offset', 0,     'qlim', [-110 110]*deg);
     RevoluteMDH('d', 2.8553548414578245e-15, 'a', 0.09745694175448363,    'alpha', -pi/2, 'offset', 0,     'qlim', [-110 110]*deg);
     RevoluteMDH('d', 1.6757428777935957e-15, 'a', 0.07180000000000028,    'alpha', pi/2,  'offset', pi/2,  'qlim', [-115 115]*deg);
-    RevoluteMDH('d', 0.05142499999999982,    'a', 2.8518063219589436e-17, 'alpha', pi/2,  'offset', 0,     'qlim', [-170 170]*deg);
+    RevoluteMDH('d', 0.05142499999999982,    'a', 2.8518063219589436e-17, 'alpha', pi/2,  'offset', pi/2,  'qlim', [-170 170]*deg);
 ];
 
 cytonR1 = SerialLink(linksR1, 'name', 'Cyton Epsilon 1500', 'manufacturer', 'Cyton');
@@ -46,7 +46,7 @@ linksR2 = [
     RevoluteMDH('d', 8.049116928532385e-16,   'a', 0.12199999999999966,   'alpha', pi/2,  'offset', 0,     'qlim', [-110 110]*deg);
     RevoluteMDH('d', -2.1510571102112408e-16, 'a', 0.12130000000000041,   'alpha', -pi/2, 'offset', 0,     'qlim', [-110 110]*deg);
     RevoluteMDH('d', 4.961309141293668e-16,   'a', 0.08469999999999993,   'alpha', pi/2,  'offset', pi/2,  'qlim', [-115 115]*deg);
-    RevoluteMDH('d', 0.05742500000000015,     'a', 8.465526395203e-16,    'alpha', pi/2,  'offset', 0,     'qlim', [-170 170]*deg);
+    RevoluteMDH('d', 0.05742500000000015,     'a', 8.465526395203e-16,    'alpha', pi/2,  'offset', pi/2,  'qlim', [-170 170]*deg);
 ];
 
 cyton = SerialLink(linksR2, 'name', 'Cyton Epsilon 1500 R2', 'manufacturer', 'Cyton');
