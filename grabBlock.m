@@ -4,14 +4,14 @@ load q1
 load q2
 blockDim = 0.02; %20mm
 bd = blockDim / 2;
-blocks = [[-0.40, -0.04, -0.025]; %abcd
-          [-0.34, -0.04, -0.012]; %efgh
-          [-0.28, -0.04, -0.005]; %ijkl
+blocks = [[-0.40, -0.04, -0.015]; %abcd
+          [-0.34, -0.04, -0.005]; %efgh
+          [-0.28, -0.04, -0.000]; %ijkl
           [-0.40, -0.10, -0.015]; %mnop
-          [-0.34, -0.10, -0.015]; %qrst
-          [-0.28, -0.10, -0.005]; %uvwx
-          [-0.34, -0.16, -0.020]; %yz .
-          [-0.28, -0.16, -0.002]];%!?,'
+          [-0.34, -0.10, -0.005]; %qrst
+          [-0.28, -0.10, -0.000]; %uvwx
+          [-0.34, -0.16, -0.005]; %yz .
+          [-0.28, -0.16, -0.000]];%!?,'
 
 qh = [deg2rad(-80), -pi/4, 0, -pi/2, 0, -pi/4, deg2rad(10)]; %resting position above blocks
 qu = [0, -pi/4, 0, -pi/4, 0, -pi/2, 0];
@@ -99,7 +99,7 @@ while 1
         
     Pt = cyton.fkine(q3(end,1:7));
     T4 = ctraj(Pt, Pu, length(t4));
-    q4 = [cyton.ikcon(T4, q3(end,1:7)), gripC*ones(length(t4),1)];
+    q4 = [cyton.ikine(T4, 'q0', q3(end,1:7)), gripC*ones(length(t4),1)];
     
     if face == uint8(1)
         traj = [q1(:,:,block);qd;qg;qu;q3;q4];
