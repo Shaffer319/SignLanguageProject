@@ -13,7 +13,7 @@ blocks = [[-0.40, -0.04, -0.015]; %abcd
 
 qh = [deg2rad(-80), -pi/4, 0, -pi/2, 0, -pi/4, deg2rad(10)]; %resting position above blocks
 Ph = cyton.fkine(qh);
-gripO = 0.0101;
+gripO = 0.0125;
 gripC = 0.009;
 
 % Time step is 0.05s, time arrays
