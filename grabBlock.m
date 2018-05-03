@@ -102,9 +102,9 @@ while 1
     q4 = [cyton.ikcon(T4, q3(end,1:7)), gripC*ones(length(t4),1)];
     
     if face == uint8(1)
-        traj = [q1(:,1:7,block);qd(:,1:7);qg(:,1:7);qu(:,1:7);q3(:,1:7);q4(:,1:7)];
+        traj = [q1(:,:,block);qd;qg;qu;q3;q4];
     else
-        traj = [q1(:,1:7,block);qr(:,1:7);qd(:,1:7);qg(:,1:7);qu(:,1:7);q3(:,1:7);q4(:,1:7)];
+        traj = [q1(:,:,block);qr;qd;qg;qu;q3;q4];
     end
     cyton.plot(traj(:,1:7), 'delay', 0.01);
     trajectory = [traj; flipud(traj)];
