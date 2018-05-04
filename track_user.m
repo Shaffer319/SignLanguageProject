@@ -34,11 +34,12 @@ colorVid = videoinput('kinect',1);
 depthVid = videoinput('kinect',2);
 
 % Get the VIDEOSOURCE object from the depth device's VIDEOINPUT object.
-depthSrc = getselectedsource(depthVid)
+depthSrc = getselectedsource(depthVid);
 
 % Turn on skeletal tracking.
 depthSrc.EnableBodyTracking = 'on';
 
+% Using manual so that the memory does not fill automatically
 triggerconfig(colorVid, 'manual');
 triggerconfig(depthVid, 'manual');
 
@@ -49,6 +50,8 @@ start([colorVid, depthVid])
 
 % Measure the time to acquire 20 frames.
 % tic
+
+% Create a single figure to update
 figure(1)
 try
     for i = 1:200
@@ -74,27 +77,47 @@ try
             % Find number of Skeletons tracked
             nBodies = length(trackedBodies);
             % Skeleton's joint indices with respect to the color image
-            jointIndices = depthMetaData(1).ColorJointIndices(:, :, trackedBodies);
+            % This V1 uses JointDepthIndices and JointImageIndices
+            colorJointIndices = depthMetaData(1).ColorJointIndices(:, :, trackedBodies);
+            depthJointIndices = depthMetaData(1).DepthJointIndices(:, :, trackedBodies);
+                        
+            % https://www.mathworks.com/help/supportpkg/kinectforwindowsruntime/ug/acquire-image-and-skeletal-data-using-kinect-v1.html?searchHighlight=Image%20and%20Skeletal%20Data%20Using%20Kinect&s_tid=doc_srchtitle
+            % https://www.mathworks.com/help/supportpkg/kinectforwindowsruntime/ug/acquire-image-and-body-data-using-kinect-v2.html
+            jointPosition = depthMetaData(1).JointPositions(:, :, trackedBodies);
 
-            disp("TRACKING")
+            % metaData = 
+            %  
+            % 11x1 struct array with fields:
+            %     IsBodyTracked: [1x6 logical]
+            %     BodyTrackingID: [1x6 double]
+            %     BodyIndexFrame: [424x512 double]
+            %     ColorJointIndices: [25x2x6 double]
+            %     DepthJointIndices: [25x2x6 double]
+            %     HandLeftState: [1x6 double] 
+            %     HandRightState: [1x6 double]
+            %     HandLeftConfidence: [1x6 double]
+            %     HandRightConfidence: [1x6 double]
+            %     JointTrackingStates: [25x6 double]
+            %     JointPositions: [25x3x6 double]
+
+            disp('TRACKING')
             hold on;
             
             % Overlay the skeleton on this RGB frame.
             for i = 1:24
-                 for body = 1:nBodies
-                     X1 = [jointIndices(SkeletonConnectionMap(i,1),1,body) jointIndices(SkeletonConnectionMap(i,2),1,body)];
-                     Y1 = [jointIndices(SkeletonConnectionMap(i,1),2,body) jointIndices(SkeletonConnectionMap(i,2),2,body)];
-                     line(X1,Y1, 'LineWidth', 1.5, 'LineStyle', '-', 'Marker', '+', 'Color', colors(body));
-                 end
-                 c = [jointIndices(4, 1, 1) jointIndices(4, 2, 1)];
-                 circle(c, 100, 'r')
-                 
-                 
+%                  % Draw full skeleton
+%                  for body = 1:nBodies
+%                      X1 = [colorJointIndices(SkeletonConnectionMap(i,1),1,body) colorJointIndices(SkeletonConnectionMap(i,2),1,body)];
+%                      Y1 = [colorJointIndices(SkeletonConnectionMap(i,1),2,body) colorJointIndices(SkeletonConnectionMap(i,2),2,body)];
+%                      line(X1,Y1, 'LineWidth', 1.5, 'LineStyle', '-', 'Marker', '+', 'Color', colors(body));
+%                  end
                  
             end
+             c = [colorJointIndices(4, 1, 1) colorJointIndices(4, 2, 1)];
+             circle(c, 100, 'r')
             hold off;
         else
-            disp("No Tracking")
+            disp('No Tracking')
         end
         drawnow
     end
@@ -107,10 +130,11 @@ end
 % timePerFrame = elapsedTime/60
 % effectiveFrameRate = 1/timePerFrame
 
-% Call the STOP function to stop the device.
+%% Call the STOP function to stop the device.
 stop([colorVid, depthVid])
 
 delete(colorVid)
 delete(depthVid)
 clear colorVid
 clear depthVid
+clear depthSrc
