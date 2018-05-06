@@ -18,6 +18,7 @@ load('test.mat')
 %initial settings
 t=0;
 k=0;
+output_to_robot = 'null';
 cyberglove_output = 'null';
 truth_list = truth_data';
 label_list = truth_classes;
@@ -29,6 +30,8 @@ ntraining_correct = 0;
 ntraining_attempts = 0;
 robot_correct = 0;
 robot_attempts = 0;
+m_correct = 0;
+m_attempts = 0;
 
 
 %modified
@@ -179,7 +182,25 @@ while k~=1
     %Derek read here
     %Need to add call to get data from Myoband if Cyberglove output is null
     if cyberglove_output == 'null'
-        output_to_robot = 'null';    %Change this to be letter from myoband
+        %output_to_robot = 'null';    %Change this to be letter from myoband
+        
+       promptm = char(strcat('Did you mean: ',estimates_classes(1),'?[y/n]\n'));
+       usr_inpm = lower(input(promptm,'s'));
+               
+        
+       if usr_inp == 'y'
+           cyberglove_output = estimates_classes(1);
+           m_correct = m_correct+1; m_attempts = m_attempts+1;
+       elseif usr_inpm == 'n'
+           %TODO
+           %skip;
+           m_attempts = m_attempts+1;
+           cyberglove_output = 'null';
+        else
+            %TODO
+            wrong_input=1;
+        end
+
     else
         output_to_robot = cyberglove_output;
     end
