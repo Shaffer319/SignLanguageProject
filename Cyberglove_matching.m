@@ -168,7 +168,8 @@ while k~=1
        elseif strcmp(usr_inp,'score')
            %print out percent correct info
            print_score(training_correct,training_attempts,ntraining_correct,ntraining_attempts,robot_correct,robot_attempts)
-       elseif usr_inp == 'end'
+
+elseif usr_inp == 'end'
            %end the program
            break;
        else
@@ -226,3 +227,4 @@ end
 
 %print out matrixes
 print_score(training_correct,training_attempts,ntraining_correct,ntraining_attempts,robot_correct,robot_attempts)
+myo_results = m_correct/m_attempts
