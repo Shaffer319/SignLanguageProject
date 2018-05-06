@@ -36,6 +36,25 @@ robot_attempts = 0;
 hGlove = Inputs.CyberGloveSerial(); % Create CyberGloveSerial object
 hGlove.initialize('COM40');          % Connect device and get config
 
+%Setup UDP
+% UdpLocalPort = 56789;
+% UdpDestinationPort = 25000; % 25100 = Left arm; 25000 = Right arm;
+% UdpAddress = '127.0.0.1'; % IP address of the computer running vMPL
+% 
+% q = [0 -0.7 0 -0.7 0 -0.7 0];
+% desiredAngles = [q, 0.01];
+% udp.putData(typecast(desiredAngles,'uint8'))
+% 
+% udp = PnetClass(8889, 8888, '127.0.0.1');
+% udp.initialize();
+udp_port = 8000;
+UdpAddress = '127.0.0.1';
+echoudp('on', udp_port)
+u = udp(UdpAddress, udp_port);
+fopen(u)
+
+
+
 %TODO
 %Add real-time option
 %CyberGlove readings
@@ -173,8 +192,9 @@ while k~=1
         if usr_inp2 == 'y'
             %TODO
             %Send to robot over UDP
-            output_to_robot = "UDP SOMETHING TODO";
-            
+            % output_to_robot = "UDP SOMETHING TODO";
+            fprintf(u, output_to_robot);
+
             block_prompt = char(strcat('Is this the correct block?[y/n]\n'));
             block_usr_inp = lower(input(block_prompt,'s'));
             [robot_correct,robot_attempts] = update_block_score(block_usr_inp, robot_correct,robot_attempts);
