@@ -36,14 +36,26 @@ t1 = 0:dt:8;
 t2 = 0:dt:4;
 tr = 0:dt:2;
 tr2 = 0:dt:4;
-t3 = 0:dt:5;
-t4 = 0:dt:5;
+t3 = 0:dt:10;
+t4 = 0:dt:10;
 gripS = (gripO - gripC) / 10;
 grip = gripO:-gripS:gripC;
+
+% cmd = PnetClass(8890, 8891, '127.0.0.1');
+% cmd.initialize();
 
 while 1
     c = input('', 's');
     c = c(1);
+    
+%     c = [];
+%     while isempty(c)
+%         [c,~] = cmd.getData()
+%     end
+%     if c = 'quit'
+%         break
+%     end
+    
     block = 0;
     face = 0;
     
@@ -52,6 +64,7 @@ while 1
         case num2cell(uint8('a'):uint8('z'))
             block = idivide(uint8(c) - uint8('a'), 4, 'floor') + 1;
             face = mod(uint8(c) - uint8('a'),  4) + 1;
+        % !!!!!!!!!!!!!!!! CHANGE THIS FOR THE DEMO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         case uint8('_') %input won't accept space so have to do underscore for now 
             block = uint8(7);
             face = uint8(3);
@@ -108,6 +121,7 @@ while 1
     end
     cyton.plot(traj(:,1:7), 'delay', 0.01);
     trajectory = [traj; flipud(traj)];
+    % PnetClass(localPort,remotePort,remoteIP);
 %     udp = PnetClass(8889, 8888, '127.0.0.1');
 %     udp.initialize();
 %     for t = trajectory.'
@@ -116,3 +130,4 @@ while 1
 %     end
 %     udp.close();
 end
+% cmd.close();
