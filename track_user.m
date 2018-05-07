@@ -105,12 +105,12 @@ try
             
             % Overlay the skeleton on this RGB frame.
             for i = 1:24
-%                  % Draw full skeleton
-%                  for body = 1:nBodies
-%                      X1 = [colorJointIndices(SkeletonConnectionMap(i,1),1,body) colorJointIndices(SkeletonConnectionMap(i,2),1,body)];
-%                      Y1 = [colorJointIndices(SkeletonConnectionMap(i,1),2,body) colorJointIndices(SkeletonConnectionMap(i,2),2,body)];
-%                      line(X1,Y1, 'LineWidth', 1.5, 'LineStyle', '-', 'Marker', '+', 'Color', colors(body));
-%                  end
+                 % Draw full skeleton
+                 for body = 1:nBodies
+                     X1 = [colorJointIndices(SkeletonConnectionMap(i,1),1,body) colorJointIndices(SkeletonConnectionMap(i,2),1,body)];
+                     Y1 = [colorJointIndices(SkeletonConnectionMap(i,1),2,body) colorJointIndices(SkeletonConnectionMap(i,2),2,body)];
+                     line(X1,Y1, 'LineWidth', 1.5, 'LineStyle', '-', 'Marker', '+', 'Color', colors(body));
+                 end
                  
             end
              c = [colorJointIndices(4, 1, 1) colorJointIndices(4, 2, 1)];

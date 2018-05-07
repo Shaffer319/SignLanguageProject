@@ -1,7 +1,8 @@
 classdef track_user_ui < handle
     %TRACK_USER_UI Summary of this class goes here
     %   Detailed explanation goes here
-    
+    % 2.125 in
+    % 2.5 in
     properties
         % Create skeleton connection map to link the joints.
         SkeletonConnectionMap = [ [4 3];  % Neck
@@ -36,12 +37,17 @@ classdef track_user_ui < handle
         depthVid;
         depthSrc;
         videoTimer;
+        user_transform;
+        
+        % UI
+        hFig;
     end
     
     methods
         function obj = track_user_ui()
             %TRACK_USER_UI Construct an instance of this class
             %   Detailed explanation goes here
+            obj.user_transform = SE3(0,0,0);
             
         end
            
@@ -50,12 +56,14 @@ classdef track_user_ui < handle
                 obj.colorVid = videoinput('kinect',1);
             catch e
                 disp(e)
+                return
             end
             try
                 obj.depthVid = videoinput('kinect',2);
             catch e
                 disp(e)
                 delete(obj.colorVid)
+                return
             end
             
             % Get the VIDEOSOURCE object from the depth device's VIDEOINPUT object.
@@ -71,26 +79,25 @@ classdef track_user_ui < handle
         end
         
         function view(obj)
-            figure('Toolbar','none',...
+            obj.hFig = figure('Toolbar','none',...
                'Menubar', 'none',...
                'NumberTitle','Off',...
                'Name','My Preview Window');
             % Create the image object in which you want to display 
             % the video preview data. Make the size of the image
             % object match the dimensions of the video frames.
-
+               
             vidRes = obj.depthVid.VideoResolution;
             nBands = obj.depthVid.NumberOfBands;
-            hImage = image( zeros(vidRes(2), vidRes(1), nBands) );
-            
+            hImage = imagesc(zeros(vidRes(2), vidRes(1), nBands) );
+ 
             obj.videoTimer = timer('Name', 'videoTimer', ...
                 'ExecutionMode', 'fixedSpacing', 'Period', 0.001,...
                 'TimerFcn', @obj.updatePreview)
             obj.videoTimer.UserData = hImage;
-            hold on
-            p = obj.circle(1,1,1)
-            s = struct('hImage',hImage, 'p', p)
-            hold off
+
+            s = struct('hImage',hImage) % , 'p', p)
+
             obj.videoTimer.UserData = s 
             start(obj.videoTimer);
         end
@@ -100,11 +107,16 @@ classdef track_user_ui < handle
             [depthFrameData, depthMetaData] = getsnapshot(obj.depthVid);
             
             s = mTimer.UserData;
-            s.hImage.CData = depthFrameData; 
+            s.hImage.CData = depthFrameData(:,:,:,1); 
             anyBodiesTracked = any(depthMetaData(1).IsBodyTracked ~= 0);
-            hold on
+            hold on    
+            
+            % Clear all old lines
+            h = findobj('type','line');
+            delete(h);
             
             if anyBodiesTracked
+                title('Tracking')
 %                 disp('Tracking')
                 trackedBodies = find(depthMetaData(1).IsBodyTracked);
 
@@ -118,27 +130,46 @@ classdef track_user_ui < handle
                 % https://www.mathworks.com/help/supportpkg/kinectforwindowsruntime/ug/acquire-image-and-skeletal-data-using-kinect-v1.html?searchHighlight=Image%20and%20Skeletal%20Data%20Using%20Kinect&s_tid=doc_srchtitle
                 % https://www.mathworks.com/help/supportpkg/kinectforwindowsruntime/ug/acquire-image-and-body-data-using-kinect-v2.html
                 jointPosition = depthMetaData(1).JointPositions(:, :, trackedBodies);
+            
+                
+                for i = 1:24
+                     % Draw full skeleton
+                     for body = 1:nBodies
+                         
+%                          X1 = [colorJointIndices(obj.SkeletonConnectionMap(i,1),1,body) colorJointIndices(obj.SkeletonConnectionMap(i,2),1,body)];
+%                          Y1 = [colorJointIndices(obj.SkeletonConnectionMap(i,1),2,body) colorJointIndices(obj.SkeletonConnectionMap(i,2),2,body)];
+                         
+                         X1 = [depthJointIndices(obj.SkeletonConnectionMap(i,1),1,body) depthJointIndices(obj.SkeletonConnectionMap(i,2),1,body)];
+                         Y1 = [depthJointIndices(obj.SkeletonConnectionMap(i,1),2,body) depthJointIndices(obj.SkeletonConnectionMap(i,2),2,body)];
+                         line(X1,Y1, 'LineWidth', 1.5, 'LineStyle', '-', 'Marker', '+', 'Color', obj.colors(body));
+                     end
+
+                end
                 
                 head_xyz = jointPosition(4,:);
                 
+                obj.user_transform = SE3(head_xyz);
                 % Todo send udp of head_xyz
                 
                 c = [depthJointIndices(4, 1, 1) depthJointIndices(4, 2, 1)];
                 
-                delete(s.p)
                 r = 10;
                 ang=0:0.01:2*pi; 
                 xp=r*cos(ang);
                 yp=r*sin(ang);
-                s.p = plot(c(1)+xp,c(2)+yp, 'k');
-                obj.videoTimer.UserData = s;
-%                 circle(c, 100, 'r')
+                plot(c(1)+xp,c(2)+yp, 'k');
+                
+                
                 
             else                
+                title('Not Tracking')
 %                 disp('Not Tracking')
             end
             hold off
-            %getData(handleToVideoInput)
+            
+            % Update user data
+            obj.videoTimer.UserData = s;
+            
         end
         
         function stopView(obj)
